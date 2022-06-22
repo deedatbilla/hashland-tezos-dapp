@@ -1,24 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useState } from "react";
+import logo from "./assets/logo.svg";
+import "./App.css";
+import LandCard from "./components/cards/LandCard";
+import Header from "./components/Header";
+import Home from "./features/Home";
+import { Provider } from "./context/context";
+// import LandDetails from "./features/LandDetails";
+import Routes from "./Routes";
+// KT1WhpBeAViNuJ3wpB85mjucoyySC4ko7dP9
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider>
+       <Header />
+      <div className=" max-w-screen mx-auto w-full">
+        <Routes />
+      </div>
+     </Provider>
   );
 }
 
