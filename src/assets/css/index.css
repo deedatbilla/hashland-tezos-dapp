@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+#root {
+  height: 100%;
+}
+
+input[type='text']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+input[type='number']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+input[type='email']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+input[type='tel']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+input[type='date']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+input[type='password']:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+select:disabled {
+  background: #eeeff0 !important;
+}
+
+textarea:disabled {
+  background: #eeeff0 !important;
+  opacity: 0.7;
+}
+
+.introjs-tooltip {
+  font-family: 'Inter', sans-serif;
+}
+
+.introjs-button {
+  text-shadow: none !important;
+}
+
+.introjs-button:focus {
+  box-shadow: none;
+}
+
+.introjs-button :active {
+  border: none !important;
+  outline: none !important;
+}
+
+.introjs-nextbutton {
+  color: #fff !important;
+  background-color: #70c1b3 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.introjs-prevbutton {
+  color: #70c1b3 !important;
+  background-color: #fff !important;
+  border: 1px solid #70c1b3 !important;
+  outline: none !important;
+}
+
+.introjs-bullets ul li a.active {
+  background-color: #70c1b3 !important;
+  border-bottom: 2px solid #70c1b3 !important;
+}
