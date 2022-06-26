@@ -1,0 +1,185 @@
+
+type id = int;
+type landid=int;
+type addr = address;
+type reqStatus=
+| ["Default", string]
+| ["pending", int]
+| ["reject", string]
+| ["approved", string];
+
+type landDetails = {
+  id       : int,
+  name   : string,
+  isAvailable : bool,
+  region     : string,
+  district     : string,
+  imageHash:string,
+  surveyNumber: string,
+  documentHash:string,
+  marketValue:tez,
+  // requester    : address,
+  currentOwner : address,
+  requestStatus: string,
+  width:int,
+  length:int,
+};
+
+type registrationDetails = {
+  name   : string,
+  region     : string,
+  district     : string,
+  surveyNumber: string,
+  marketValue:tez,
+  documentHash:string,
+ imageHash:string,
+  // requester    : address,
+  width:int,
+  length:int,
+  currentOwner : address,
+};
+type profile= {
+  name : string,
+  nationalID : string,
+  assetList:list,
+
+};
+// let all_lands: list<landDetails> = list([]);
+
+type storage = {
+  all_lands: big_map<id, landDetails>,
+  next_id: int,
+//   profiles:big_map<addr, profile>,
+  
+};
+
+
+type buy=int;
+      
+
+
+// type storage = int;
+
+
+/* Main access point that dispatches to the entrypoints according to
+   the smart contract parameter. */
+
+type action =
+| ["Register", registrationDetails]
+| ["Buy", buy];
+
+
+
+
+const registerLand = ([parameter, storage]: [registrationDetails, storage]) :[list<operation>, storage] => {
+
+  let  district = parameter.district;
+  let region = parameter.region;
+  let surveyNumber = parameter.surveyNumber;
+  let marketValue = parameter.marketValue;
+  let name=parameter.name;
+  let width=parameter.width;
+  let length=parameter.length;
+  let documentHash=parameter.documentHash;
+  let all_lands = storage.all_lands;
+  let  imageHash=parameter.imageHash;
+//   let all_profiles=storage.profiles;
+  let new_id = storage.next_id;
+  let new_land_details: landDetails = {
+    id:new_id,
+    currentOwner : Tezos.get_sender(),
+    district:district,
+    region:region,
+    surveyNumber:surveyNumber,
+    name:name,
+    documentHash:documentHash,
+    width:width,
+    length:length,
+    marketValue:marketValue,
+    isAvailable:false,
+     imageHash:imageHash,
+    requestStatus:"pending",
+    // requester:
+  };
+// list([5, ...my_list])
+//let my_balance: option<move> =
+//   Big_map.find_opt("tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN" as address, moves);
+// let userAssets: option<profile>=Big_map.find_opt("tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" as address, all_profiles);
+//   let new_profile :profile={
+//       name:name,
+//       nationalID:"893",
+//       assetList:list([new_id]),
+
+//   };
+//    let updated_profiles: big_map<address, profile> =
+//     Big_map.update(Tezos.get_sender(), Some(new_profile), all_profiles);
+
+  let updated_lands: big_map<id, landDetails> =
+    Big_map.update(new_id, Some(new_land_details), all_lands);
+     return [(list([]) as list<operation>), {
+                           all_lands : updated_lands,
+                           next_id : new_id + 1,
+                        //    profiles:updated_profiles,
+                        }];
+
+};
+
+let buyLand= ([lid, storage]: [buy, storage]) :[list<operation>, storage] => {
+  let all_lands = storage.all_lands;
+   let current_land_details: landDetails =
+    match (Big_map.find_opt(lid, all_lands), {
+      Some: landDetails => landDetails,
+      None: () => (failwith("This ID does not exist.") as landDetails)
+    });
+//  if (current_land_details.marketValue >Tezos.get_amount()) {
+//     failwith("Sorry you dont have enough funds");
+//   };
+   
+   let  district = current_land_details.district;
+  let region = current_land_details.region;
+  let surveyNumber = current_land_details.surveyNumber;
+  let marketValue = current_land_details.marketValue;
+  let name=current_land_details.name;
+  let width=current_land_details.width;
+  let length=current_land_details.length;
+  let documentHash=current_land_details.documentHash;
+  let  imageHash=current_land_details.imageHash;
+  let landid=current_land_details.id;
+//   let all_profiles=storage.profiles;
+  let new_id = storage.next_id;
+  let new_land_details: landDetails = {
+    id:landid,
+    currentOwner : Tezos.get_sender(),
+    district:district,
+    region:region,
+    surveyNumber:surveyNumber,
+    name:name,
+    width:width,
+    documentHash:documentHash,
+    length:length,
+    marketValue:marketValue,
+    isAvailable:false,
+     imageHash:imageHash,
+    requestStatus:"pending",
+    // requester:
+  };
+
+     let updated_lands: big_map<landid, landDetails> =
+    Big_map.update(new_id, Some(new_land_details), all_lands);
+     return [(list([]) as list<operation>), {
+                           all_lands : updated_lands,
+                           next_id : new_id + 1,
+                        //    profiles:updated_profiles,
+                        }];
+ 
+
+};
+
+const main = ([action, storage] : [action, storage]) : [list<operation>, storage]  => {
+  return match (action, {
+    Register: r => registerLand([r, storage]),
+    Buy: l => buyLand([l, storage]),
+    
+  });
+};
+

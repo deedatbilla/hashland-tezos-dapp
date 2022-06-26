@@ -2,7 +2,7 @@ import React from "react";
 import Logo from "../assets/logo.png";
 import { FiUser } from "react-icons/fi";
 import { useAppContext } from "../context/context";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 function numberWithCommas(x) {
   x = parseFloat(x);
@@ -14,9 +14,9 @@ function Header() {
   const history = useHistory();
   return (
     <div className="flex items-center justify-between my-3 px-12 py-3">
-      <div>
+      <Link to="/">
         <img alt="d" src={Logo} width={150} />
-      </div>
+      </Link>
 
       <div className="flex items-center space-x-3">
         <button
@@ -25,6 +25,9 @@ function Header() {
         >
           <p className="font-bold">Become a seller</p>
           <FiUser />
+        </button>
+        <button onClick={() => history.push(`/my-lands`)}>
+          <p>My lands</p>
         </button>
         {!tezConfig.beaconConnection ? (
           <button
@@ -39,7 +42,10 @@ function Header() {
           </div>
         )}
         <div className=" bg-green-300 rounded-full px-6 py-2">
-          <p>Balance :{numberWithCommas(Number(tezConfig.userBalance/1000000))} TEZ</p>
+          <p>
+            Balance :{numberWithCommas(Number(tezConfig.userBalance / 1000000))}{" "}
+            TEZ
+          </p>
         </div>
       </div>
     </div>

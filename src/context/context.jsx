@@ -6,7 +6,10 @@ const Context = createContext({
   tezConfig: {},
   connectWallet: () => {},
   registerLand: () => {},
+  buyLand: () => {},
   landsList: [],
+  loading: false,
+  setLoading: () => {},
 });
 // const dAppClient = new DAppClient({ name: "Hashland" });
 const Tezos = new TezosToolkit("https://ithacanet.ecadinfra.com");
@@ -25,12 +28,14 @@ const Provider = ({ children }) => {
     beaconConnection: false,
   });
   const [landsList, setLandsList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  console.log(NetworkType.ITHACANET);
-  const contractAddress = "KT1ER46fqwZD7G94AUrpn4u2aMA4ekmKW52t";
+  // const contractAddress = "KT1Uo9zgfuHLFXxJstvSSCQawThERyPziKLE";
+  const contractAddress = "KT1Lge64EYqLtYmqR38xZhWKcmfmdvTr6o1n";
 
   const connectWallet = async () => {
     try {
+      setLoading(true)
       console.log("Requesting permissions...");
       const permissions = await wallet.client.requestPermissions({
         network: {
@@ -45,13 +50,14 @@ const Provider = ({ children }) => {
       // gets user's address
       const userAddress = await wallet.getPKH();
       await initializeDapp();
+      setLoading(false)
       console.log("Got permissions:", userAddress);
     } catch (error) {
       console.log("Got error:", error);
+      setLoading(false)
     }
   };
 
-  console.log(tezConfig);
   const registerLand = async ({
     name,
     region,
@@ -60,32 +66,35 @@ const Provider = ({ children }) => {
     marketValue,
     width,
     length,
+    imageHash,
+    documentHash,
   }) => {
     try {
       const { contract, userAddress } = tezConfig;
 
       // console.log(JSON.stringify(contract.methods));
       //  const op= await contract.methods.default('1').send()
-      const { currentOwner, documentHash } = {
+      const { currentOwner } = {
         currentOwner: userAddress,
-        documentHash: "retrtretert",
       };
-      console.log(
-        currentOwner,
-        district,
-        documentHash,
-        Number(length),
-        Number(marketValue),
-        name,
-        region,
-        surveyNumber,
-        Number(width)
-      );
+      // console.log(
+      //   currentOwner,
+      //   district,
+      //   documentHash,
+      //   imageHash,
+      //   Number(length),
+      //   Number(marketValue),
+      //   name,
+      //   region,
+      //   surveyNumber,
+      //   Number(width)
+      // );
       const op = await contract.methods
         .register(
           currentOwner,
           district,
           documentHash,
+          imageHash,
           Number(length),
           Number(marketValue),
           name,
@@ -102,6 +111,18 @@ const Provider = ({ children }) => {
       console.log(error.message);
     }
   };
+
+  const buyLand = async (id, amount) => {
+    try {
+      setLoading(true)
+      const { contract, userAddress } = tezConfig;
+      const op = await contract.methods.buy(id).send({ amount });
+      await op.confirmation();
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+    }
+  };
   const fetchAllLands = async ({ storage, contract }) => {
     try {
       const lands = await storage.all_lands;
@@ -111,24 +132,24 @@ const Provider = ({ children }) => {
       );
       let hashes = await response.json();
       hashes = hashes.map((item) => item.key);
-      console.log(hashes, "here14");
 
       let allLands = await storage.all_lands.getMultipleValues([...hashes]);
-      console.log(hashes, allLands, "here");
+      // console.log(hashes, allLands, "here");
       let list = [];
       allLands.forEach((value, key) => {
         list.push(value);
       });
       setLandsList(list);
 
-      console.log("done");
-      console.log(lands.toJSON());
+      // console.log("done");
+      // console.log(lands.toJSON());
     } catch (error) {
       console.log(error);
     }
   };
   const initializeDapp = async () => {
     try {
+      setLoading(true)
       const activeAccount = await wallet.client.getActiveAccount();
 
       if (activeAccount) {
@@ -151,12 +172,15 @@ const Provider = ({ children }) => {
           contract,
         });
         await fetchAllLands({ storage, contract });
+       
       } else {
         // The user is not connected. A button should be displayed where the user can connect to his wallet.
         console.log("Not connected!");
       }
+      setLoading(false)
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -170,6 +194,9 @@ const Provider = ({ children }) => {
     connectWallet,
     registerLand,
     landsList,
+    buyLand,
+    loading,
+    setLoading,
   };
   return <Context.Provider value={state}>{children}</Context.Provider>;
 };
